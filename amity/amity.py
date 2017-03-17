@@ -63,19 +63,19 @@ class Amity(object):
 
     def _search_room(self, person_name, room_type, max_occupants):
         office = self.rooms.get(room_type).keys()
-        print("office", office)
+        search_office = list(office)
         searching = True
         while searching:
-            random_office = random.choice(list(office))
+            random_office = random.choice(search_office)
             occupants = self.rooms.get(room_type)[random_office]
         # check # of occupants in room against MAX_OFFICE_OCCUPANTS
             if len(occupants) < max_occupants:
                 occupants.append(person_name)
                 return random_office
             # pop a room once it has been chosen
-            office.remove(random_office)
+            search_office.remove(random_office)
             # check if len of office is 1 exit
-            if not len(office):
+            if not len(search_office):
                 searching = False
 
         return None
@@ -134,6 +134,7 @@ class Amity(object):
                 except IndexError:
                     pass
                 self.add_person(fullname, position, accomodation)
+        return {'Done': "File has been loaded successfully"}
 
     def print_allocations(self, room_type, filename):
         allocated_rooms = self.rooms.get(room_type)

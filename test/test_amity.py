@@ -141,15 +141,13 @@ class AmityTest(unittest.TestCase):
         self.assertIn('Success', available_occupants)
 
 
-    # def test_load_people_from_file(self):
-    #     # self.Amity.create_room('MOMBASA', 'office')
-    #     # self.Amity.create_room('KENYA', 'livingspace')
-    #     # persons_list = self.Amity.persons
-    #     # print(persons_list)
-    #     # self.assertEqual(len(persons_list), 2)
-    #     dirname = os.path.dirname(os.path.realpath(__file__))
-    #     self.Amity.load_people(os.path.join(dirname, "test_people.txt"))
-    #     self.assertEqual(len(self.Amity.persons), 4)
+    def test_load_people_from_file(self):
+        self.Amity.create_room('MOMBASA', 'office')
+        self.Amity.create_room('KENYA', 'livingspace')
+        persons_list = self.Amity.persons.get('fellow')
+        self.assertEqual(len(persons_list), 0)
+        self.Amity.load_people("test_people.txt")
+        self.assertEqual(len(persons_list), 4)
 
 
 
