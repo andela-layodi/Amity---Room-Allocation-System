@@ -121,8 +121,8 @@ class Amity(object):
         return occupants_list
 
     def load_people(self, filename):
-        with open('load_people.txt', 'r') as filename:
-            content = filename.readlines()
+        with open(filename, 'r') as file_name:
+            content = file_name.readlines()
             for line in content:
                 data = line.split()
                 firstname = data[0]
@@ -136,26 +136,29 @@ class Amity(object):
                 self.add_person(fullname, position, accomodation)
 
     def print_allocations(self, room_type, filename):
-        get_those_rooms = self.rooms.get(room_type)
-        return get_those_rooms
+        allocated_rooms = self.rooms.get(room_type)
+        # return get_those_rooms
 
         with open('rooms.txt', 'w') as myfile:
-            for key in sorted(get_those_rooms):
-                myfile.write(key + '\n' + '-' * 60 + '\n' + ','.join(get_those_rooms[key]) + '\n')
+            for key in sorted(allocated_rooms):
+                myfile.write(key + '\n' + '-' * 60 + '\n' + ','.join(allocated_rooms[key]) + '\n')
+        return allocated_rooms
 
     def print_unallocated(self, room_type, room_name, filename):
         unallocated = []
-        get_those_rooms = self.rooms.get(room_type)
+        allocated_rooms = self.rooms.get(room_type)
         for value in self.persons[room_type]:
-            if value not in get_those_rooms:
+            if value not in allocated_rooms:
                 unallocated.append(value)
         return unallocated
 
     def print_room(self, room_type, room_name):
-        get_those_rooms = self.rooms.get(room_type)
-        return get_those_rooms[room_name]
+        allocated_rooms = self.rooms.get(room_type)
+        available_occupants = allocated_rooms[room_name]
+        return {"Success": "The occupants of {} are {}".format(room_name, available_occupants)}
 
     def save_state(self):
         pass
 
-    
+    def load_state(self):
+        pass

@@ -1,5 +1,6 @@
 import unittest
 from amity.amity import Amity
+import os
 
 
 class AmityTest(unittest.TestCase):
@@ -118,14 +119,37 @@ class AmityTest(unittest.TestCase):
         reallocate_person = self.Amity.reallocate_person("office", 'LAGOS', 'MOMBASA', 'LESLEY AYODI')
         self.assertEqual(False, reallocate_person)
 
+    def test_print_allocations(self):
+        self.Amity.create_room('LAGOS', 'office')
+        self.Amity.add_person('LESLEY AYODI', 'staff', 'N')
+        allocated_room = self.Amity.print_allocations('office', 'rooms.txt')
+        self.assertEqual(allocated_room, {'LAGOS': ['LESLEY AYODI']})
 
 
+    def test_print_allocations_terminal(self):
+        self.Amity.create_room('LAGOS', 'office')
+        self.Amity.add_person('LESLEY AYODI', 'staff', 'N')
+        allocated_room = self.Amity.print_allocations('office', 'rooms.txt')
+        self.assertEqual(allocated_room, {'LAGOS': ['LESLEY AYODI']})
+
+    def test_print_room_occupants(self):
+        self.Amity.create_room('MOMBASA', 'office')
+        self.Amity.add_person('LESLEY AYODI', 'staff', 'N')
+        self.Amity.add_person('LAVENDER AYODI', 'fellow', 'N')
+        self.Amity.add_person('PATIENCE AYODI', 'staff', 'N')
+        available_occupants = self.Amity.print_room('office', 'MOMBASA')
+        self.assertIn('Success', available_occupants)
 
 
-
-
-
-
+    # def test_load_people_from_file(self):
+    #     # self.Amity.create_room('MOMBASA', 'office')
+    #     # self.Amity.create_room('KENYA', 'livingspace')
+    #     # persons_list = self.Amity.persons
+    #     # print(persons_list)
+    #     # self.assertEqual(len(persons_list), 2)
+    #     dirname = os.path.dirname(os.path.realpath(__file__))
+    #     self.Amity.load_people(os.path.join(dirname, "test_people.txt"))
+    #     self.assertEqual(len(self.Amity.persons), 4)
 
 
 
