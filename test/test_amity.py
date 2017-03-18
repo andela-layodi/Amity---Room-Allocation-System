@@ -149,8 +149,19 @@ class AmityTest(unittest.TestCase):
         self.Amity.load_people("test_people.txt")
         self.assertEqual(len(persons_list), 4)
 
-
-
+    def test_allocated_people(self):
+        self.Amity.create_room('MOMBASA', 'office')
+        self.Amity.add_person('LESLEY AYODI', 'staff', 'N')
+        self.Amity.add_person('LAVENDER AYODI', 'fellow', 'N')
+        self.Amity.add_person('PATIENCE AYODI', 'staff', 'N')
+        self.Amity.add_person('SIMON AYODI', 'staff', 'N')
+        self.Amity.add_person('GRACE AYODI', 'staff', 'N')
+        self.Amity.add_person('GRACE NJERI', 'staff', 'N')
+        self.Amity.create_room('PLATFORM', 'livingspace')
+        self.Amity.add_person('LESLEY MBINGU', 'fellow', 'Y')
+        self.Amity.add_person('MARY NJERI', 'fellow', 'Y')
+        allocate_persons = self.Amity.print_unallocated('fellow', "test_people.txt")
+        self.assertEqual(len(allocate_persons), 3)
 
 if __name__ == '__main__':
     unittest.main()

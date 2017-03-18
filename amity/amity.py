@@ -41,41 +41,48 @@ class Amity(object):
 
         if person_name in self.persons.get(person_type):
             return "Name already exists. Choose another name."
+
         allocated_space = {}
-        self.persons.get(person_type).append(person_name)
-        allocated_office = self._search_room(
-                                        person_name,
-                                        "office",
-                                        self.MAX_OFFICE_OCCUPANTS
-                                        )
-        if allocated_office:
-            allocated_space["office"] = allocated_office
-        if person_type.lower() == "fellow":
-            if wants_accomodation is not "N":
-                allocated_livingspace = self._search_room(
-                                                            person_name,
-                                                            "livingspace",
-                                                            self.MAX_LIVING_OCCUPANTS
-                                                            )
-                if allocated_livingspace:
-                    allocated_space["livingspace"] = allocated_livingspace
-        return allocated_space
+        if self.persons.get(person_type) is not None:
+            self._save_person(person_type, person_name)
+            allocated_office = self._search_room(
+                                            person_name,
+                                            "office",
+                                            self.MAX_OFFICE_OCCUPANTS
+                                            )
+            if allocated_office:
+                allocated_space["office"] = allocated_office
+            if person_type.lower() == "fellow":
+                if wants_accomodation is not "N":
+                    allocated_livingspace = self._search_room(
+                                                                person_name,
+                                                                "livingspace",
+                                                                self.MAX_LIVING_OCCUPANTS
+                                                                )
+                    if allocated_livingspace:
+                        allocated_space["livingspace"] = allocated_livingspace
+            return allocated_space
+
+    def _save_person(self, person_type, person_name):
+        if person_type.lower() == person_type:
+            self.persons.get(person_type).append(person_name)
+            return self.persons.get(person_type)
 
     def _search_room(self, person_name, room_type, max_occupants):
-        office = self.rooms.get(room_type).keys()
-        search_office = list(office)
+        room = self.rooms.get(room_type).keys()
+        search_room = list(room)
         searching = True
         while searching:
-            random_office = random.choice(search_office)
-            occupants = self.rooms.get(room_type)[random_office]
+            random_room = random.choice(search_room)
+            occupants = self.rooms.get(room_type)[random_room]
         # check # of occupants in room against MAX_OFFICE_OCCUPANTS
             if len(occupants) < max_occupants:
                 occupants.append(person_name)
-                return random_office
+                return random_room
             # pop a room once it has been chosen
-            search_office.remove(random_office)
+            search_room.remove(random_room)
             # check if len of office is 1 exit
-            if not len(search_office):
+            if not len(search_room):
                 searching = False
 
         return None
@@ -145,13 +152,25 @@ class Amity(object):
                 myfile.write(key + '\n' + '-' * 60 + '\n' + ','.join(allocated_rooms[key]) + '\n')
         return allocated_rooms
 
-    def print_unallocated(self, room_type, room_name, filename):
-        unallocated = []
-        allocated_rooms = self.rooms.get(room_type)
-        for value in self.persons[room_type]:
-            if value not in allocated_rooms:
-                unallocated.append(value)
-        return unallocated
+    def _nested_dict_values(self, d):
+        for value in d.values():
+            if isinstance(value, dict):
+                yield from self._nested_dict_values(value)
+            else:
+                yield value
+
+    def print_unallocated(self, person_type, filename):
+        # unallocated = []
+        if self.rooms is not None:
+            persons_allocated = self._nested_dict_values(self.rooms)
+            allocated_list = list(persons_allocated)
+            allocated_persons = self.persons.get(person_type)
+            return allocated_persons
+        # allocated_rooms = self.rooms.get(room_type)
+        # for value in self.persons[room_type]:
+        #     if value not in allocated_rooms:
+        #         unallocated.append(value)
+        # return unallocated
 
     def print_room(self, room_type, room_name):
         allocated_rooms = self.rooms.get(room_type)
