@@ -148,12 +148,5 @@ class AmityTest(unittest.TestCase):
         self.Amity.load_people("test_people.txt")
         self.assertEqual(len(persons_list), 4)
 
-    def test_save_state_works(self):
-        self.Amity.create_room('MOMBASA', 'office')
-        self.Amity.add_person('LESLEY AYODI', 'staff', 'N')
-        self.Amity.add_person('LAVENDER AYODI', 'fellow', 'N')
-        self.Amity.add_person('PATIENCE AYODI', 'staff', 'N')
-        saved_state = self.Amity.save_state("test_amity.db")
-        self.assertEqual(True, saved_state)
 if __name__ == '__main__':
     unittest.main()

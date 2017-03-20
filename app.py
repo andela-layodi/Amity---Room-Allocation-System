@@ -4,14 +4,14 @@ Room Allocation System
 This system facilitates easier room allocation for people at Amity.
 Usage:
         create_room <room_name> <room_type>
-    	add_person <person_name> <person_type> <wants_accommodation>
-    	reallocate_person <room_type> <current_room> <new_room> <person_name>
+    	add_person <first_name> <second_name> <person_type> <wants_accomodation>
+    	reallocate_person <room_type> <current_room> <new_room> <first_name> <second_name>
     	load_people <filename>
-    	print_allocations <room_type>[--o=filename]
+    	print_allocations <room_type> <filename>
     	print_unallocated <room_type> <room_name>[--o=filename]
         print_room <room_type> <room_name>
-    	load_state [--dbname]
-    	save_state [--o=db_name]
+        save_state <db_name>
+        load_state <db_name>
     	quit
         (-i | --interactive)
         (-h | --help | --version)
@@ -81,51 +81,51 @@ class AmityApp(cmd.Cmd):
 
 
     @docopt_cmd
-    def do_add_person(self, args):
+    def do_add_person(self, arg):
         """
         Creates a new person and assigns them to a random room in Amity.
-        Usage: add_person <person_name> <person_type> <wants_accommodation>
+        Usage: add_person <first_name> <second_name> <person_type> <wants_accomodation>
         """
-        person_name = arg["<person_name>"]
+        print (arg)
+        person_name = arg["<first_name>"] + " " + arg["<second_name>"]
         person_type = arg["<person_type>"]
-        wants_accommodation = arg["<wants_accommodation>"]
-        add_person_status = self.amity.add_person(person_name, person_type, wants_accomodation)
+        wants_accomodation = arg["<wants_accomodation>"]
 
-        if add_person_status == "Please insert a name.":
-            print ("Please insert a name.")
+        print (self.amity.add_person(person_name, person_type, wants_accomodation))
 
-        if add_person_status == "Name already exists. Choose another name.":
-            print ("Name already exists. Choose another name.")
-
-        amity_rooms = self.amity.rooms.get(room_type)
-        print (amity_rooms.get(room_name))
 
     @docopt_cmd
-    def do_reallocate_person(self, args):
+    def do_reallocate_person(self, arg):
         """
         Reallocates a person to a new room of their choice.
         Usage: reallocate_person <room_type> <current_room> <new_room> <person_name>
         """
-        pass
+        room_type = arg["<room_type>"]
+        current_room = arg["<current_room>"]
+        room_name = arg["<new_room>"]
+        person_name = arg["<person_name>"]
+        print (self.amity.reallocate_person(room_type, current_room, room_name, person_name))
 
     @docopt_cmd
-    def do_load_people(self, args):
+    def do_load_people(self, arg):
         """
         Loads people into the Amity system from a text file.
         Usage: load_people <filename>
         """
-        pass
+        print (self.amity.load_people(arg["<filename>"]))
 
     @docopt_cmd
-    def do_print_allocations(self, args):
+    def do_print_allocations(self, arg):
         """
         Prints and outputs the people who have been successfully allocated a space per room.
-        Usage: print_allocations <room_type>[--o=filename]
+        Usage: print_allocations <room_type> <filename>
         """
-        pass
+        room_type = arg["<room_type>"]
+        filename = arg['<filename>']
+        print (self.amity.print_allocations(room_type, filename))
 
     @docopt_cmd
-    def do_print_unallocated(self, args):
+    def do_print_unallocated(self, arg):
         """
         Prints and outputs the people who have been not yet been allocated a room.
         Usage: print_unallocated <room_type> <room_name>[--o=filename]
@@ -133,28 +133,37 @@ class AmityApp(cmd.Cmd):
         pass
 
     @docopt_cmd
-    def do_print_room(self, args):
+    def do_print_room(self, arg):
         """
         Prints the people who have been allocated the specified room.
         Usage: print_room <room_type> <room_name>
         """
-        pass
+        room_type = arg["<room_type>"]
+        room_name = arg['<room_name>']
+        print (self.amity.print_room(room_type, room_name))
 
     @docopt_cmd
-    def do_save_state(self, args):
+    def do_save_state(self, arg):
         """
         Saves the data to a SQLite database
-        Usage: print_room <room_type> <room_name>
+        Usage: save_state <db_name>
         """
+        # db = arg[<"db_name">]
+		# if db:
+		# 	self.amity.save_state(db)
+		# else:
+		# 	self.amity.save_state()
         pass
 
     @docopt_cmd
-    def do_load_state(self, args):
+    def do_load_state(self, arg):
         """
         Loads the data to a SQLite database
-        Usage: print_room <room_type> <room_name>
+        Usage: load_state <db_name>
         """
-        pass
+        db_name = arg["<db_name>"]
+
+        print (self.amity.load_state(db_name))
 
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""
@@ -162,13 +171,9 @@ class AmityApp(cmd.Cmd):
         print('Till next time, Good Bye!')
         exit()
 
-
-# opt = docopt(__doc__, sys.argv[1:])
-
 if __name__ == '__main__':
     try:
+        print(__doc__)
         AmityApp().cmdloop()
     except KeyboardInterrupt:
         print ('Exiting Application')
-
-# print(opt)
