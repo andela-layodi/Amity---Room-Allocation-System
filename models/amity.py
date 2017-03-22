@@ -1,10 +1,13 @@
 import random
 import sqlite3
 
+
 class Amity(object):
     """
-        This class contains all the rooms and all the people added the Amity Room Allocation System.
+        This class contains all the rooms and all the people added
+        the Amity Room Allocation System.
     """
+
     def __init__(self):
         self.MAX_OFFICE_OCCUPANTS = 6
         self.MAX_LIVING_OCCUPANTS = 4
@@ -15,7 +18,7 @@ class Amity(object):
         self.persons = {
             'fellow': [],
             'staff': []
-            }
+        }
 
     def create_room(self, room_name, room_type):
         """
@@ -26,30 +29,28 @@ class Amity(object):
 
         amity_rooms = self.rooms.get(room_type, None)
         if room_type not in self.rooms.keys():
-            return {"Error" : "Insert office or livingspace for room type"}
+            return {"Error": "Insert office or livingspace for room type"}
         if amity_rooms.get(room_name) is not None:
             return {"Error": "This room already exists"}
-        # check if room is either office or livingspace
-        # print (self.rooms.get(room_type))
         if self.rooms.get(room_type, None) is not None:
-            return {"Success": "Room has been added successfully"}  # {"Lagos": []}
-        # room type does not exist
-        return "Invalid entry. Please retry."
+            self._assign_room_name(room_type, room_name)
+            return {"Success": "Room has been added successfully"}
 
-    def assign_room_name(self, room_type, room_name):
+    def _assign_room_name(self, room_type, room_name):
         """
             Used by the create_room function.
-            This is where the respective room type is specified before the room name
-            is added and saved.
+            This is where the respective room type is specified before the
+            room name is added and saved.
         """
-        if room_type.lower() == room_type:  # {"Lagos": []}
+        if room_type.lower() == room_type:
             self.rooms[room_type][room_name] = []
             return self.rooms.get(room_type)
 
-    def add_person(self, person_name, person_type='fellow', wants_accomodation="N"):
+    def add_person(
+            self, person_name, person_type='fellow', wants_accomodation="N"):
         """
-            Adds new people into the system by specifying their role and automatically
-            allocates them to a random room.
+            Adds new people into the system by specifying their role and
+            automatically allocates them to a random room.
         """
         if not person_name:
             return "Please insert a name."
@@ -57,38 +58,38 @@ class Amity(object):
         if person_name in self.persons.get(person_type):
             return "Name already exists. Choose another name."
         if person_type not in self.persons.keys():
-            return {"Error" : "Insert fellow or staff for person type"}
+            return {"Error": "Insert fellow or staff for person type"}
         allocated_space = {}
         self.persons.get(person_type).append(person_name)
         allocated_office = self._search_room(
-                                        person_name,
-                                        "office",
-                                        self.MAX_OFFICE_OCCUPANTS
-                                        )
+            person_name,
+            "office",
+            self.MAX_OFFICE_OCCUPANTS
+        )
         if allocated_office:
             allocated_space["office"] = allocated_office
         if person_type.lower() == "fellow" and wants_accomodation is not "N":
-                allocated_livingspace = self._search_room(
-                                                            person_name,
-                                                            "livingspace",
-                                                            self.MAX_LIVING_OCCUPANTS
-                                                            )
-                if allocated_livingspace:
-                    allocated_space["livingspace"] = allocated_livingspace
-        else:
-            return "Staff cannot be allocated a livingspace."
+            allocated_livingspace = self._search_room(
+                person_name,
+                "livingspace",
+                self.MAX_LIVING_OCCUPANTS
+            )
+            if allocated_livingspace:
+                allocated_space["livingspace"] = allocated_livingspace
         user_room = allocated_space.values()
-        return {"Done": "{} has been added to room {}".format(person_name, user_room)}
+        for room in user_room:
+            return {
+                "Done": "{} has been added to {}".format(person_name, room)
+            }
 
     def _search_room(self, person_name, room_type, max_occupants):
         """
             Used by the add_person function.
-            Assists in the selection and allocation of a random room from the available rooms.
+            Assists in the selection and allocation of a random room from
+            the available rooms.
         """
         office = self.rooms.get(room_type).keys()
         search_office = list(office)
-        if not search_office:
-            return "Kindly insert a room to continue"
         searching = True
         while searching:
             random_office = random.choice(search_office)
@@ -105,10 +106,11 @@ class Amity(object):
 
         return None
 
-    def reallocate_person(self, room_type, current_room, room_name, person_name):
+    def reallocate_person(
+            self, room_type, current_room, room_name, person_name):
         """
-            Reallocates a person from the current room to a new room of their choice,
-            only if space is available.
+            Reallocates a person from the current room to a new room of
+            their choice, only if space is available.
             Returns : {`Error`: <Message>}  on error
                       True on successful reallocation
                       False on fail
@@ -119,7 +121,9 @@ class Amity(object):
             return current_roommates
 
         if person_name not in current_roommates:
-            return {"Error": "{} not found in {}".format(person_name, current_room)}
+            return {
+                "Error": "{} not found in {}".format(person_name, current_room)
+            }
 
         new_roommates = self._find_room_occupant(room_type, room_name)
         if "Error" in new_roommates:
@@ -133,12 +137,12 @@ class Amity(object):
 
         return False
 
-
     def _find_room_occupant(self, room_type, room_name):
         """
             Used by the reallocate person function.
             It checks the current occupants of the new room as well as checking
-            if the person requesting for reallocation has a room in the first place.
+            if the person requesting for reallocation has a room in the first
+            place.
         """
         check_room_type = self.rooms.get(room_type)
         if check_room_type is None:
@@ -154,11 +158,11 @@ class Amity(object):
 
     def load_people(self, filename):
         """
-            Loads new people form a text file to the system in order for them to
-            be allocated spaces.
+            Loads new people form a text file to the system in order for them
+            to be allocated spaces.
         """
-        with open(filename, 'r') as file_name:
-            content = file_name.readlines()
+        with open(filename, 'r') as filename:
+            content = filename.readlines()
             for line in content:
                 data = line.split()
                 firstname = data[0]
@@ -182,7 +186,15 @@ class Amity(object):
 
         with open('rooms.txt', 'w') as myfile:
             for key in sorted(allocated_rooms):
-                myfile.write(key + '\n' + '-' * 60 + '\n' + ','.join(allocated_rooms[key]) + '\n')
+                myfile.write(
+                    key +
+                    '\n' +
+                    '-' *
+                    60 +
+                    '\n' +
+                    ','.join(
+                        allocated_rooms[key]) +
+                    '\n')
         return allocated_rooms
 
     def print_unallocated(self, room_type, room_name, filename):
@@ -202,8 +214,10 @@ class Amity(object):
             Prints out the members of a specified room in the Amity system.
         """
         allocated_rooms = self.rooms.get(room_type)
-        available_occupants = allocated_rooms[room_name]
-        return {"Success": "The occupants of {} are {}".format(room_name, available_occupants)}
+        people = allocated_rooms.get(room_name)
+        return {
+            "Success": "The occupants of {} are {}".format(room_name, people)
+        }
 
     def save_state(self, db_name):
         """
@@ -213,105 +227,116 @@ class Amity(object):
         conn = sqlite3.connect(db_name)
         cur = conn.cursor()
         cur.execute("DROP TABLE IF EXISTS Person")
-        cur.execute('CREATE TABLE {table_name}({first_column} TEXT, {second_column} TEXT)'.format(table_name = "Person", first_column = "Name", second_column = "Role"))
+        cur.execute(
+            'CREATE TABLE {table_name}({first_col} TEXT, {second_col} TEXT)'
+            .format(
+                table_name="Person",
+                first_col="Name",
+                second_col="Role"))
         cur.execute("DROP TABLE IF EXISTS Room")
-        cur.execute('CREATE TABLE {table_name}({first_column} TEXT, {second_column} TEXT)'.format(table_name = "Room", first_column = "Name", second_column = "Type"))
+        cur.execute(
+            'CREATE TABLE {table_name}({first_col} TEXT, {second_col} TEXT)'
+            .format(
+                table_name="Room",
+                first_col="Name",
+                second_col="Type"))
         cur.execute("DROP TABLE IF EXISTS Allocated")
-        cur.execute('CREATE TABLE {table_name}({first_column} TEXT, {second_column} TEXT)'.format(table_name = "Allocated", first_column = "Person_Name", second_column = "Room_Name"))
+        cur.execute(
+            'CREATE TABLE {table_name}({first_col} TEXT, {second_col} TEXT)'
+            .format(
+                table_name="Allocated",
+                first_col="Person_Name",
+                second_col="Room_Name"))
         all_fellows = self.persons.get('fellow')
         for fellow in all_fellows:
-            cur.execute('INSERT INTO Person(Name, Role) VALUES(?, ?)',(fellow, "fellow"))
+            cur.execute(
+                'INSERT INTO Person(Name, Role) VALUES(?, ?)',
+                (fellow, "fellow"))
 
         all_staff = self.persons.get('staff')
         for staff in all_staff:
-            cur.execute('INSERT INTO Person(Name, Role) VALUES(?, ?)',(staff, "staff"))
+            cur.execute(
+                'INSERT INTO Person(Name, Role) VALUES(?, ?)', (staff, "staff")
+            )
 
         all_offices = self.rooms.get('office')
         for office in all_offices:
-            cur.execute('INSERT INTO Room(Name, Type) VALUES(?, ?)',(office, "office"))
+            cur.execute(
+                'INSERT INTO Room(Name, Type) VALUES(?, ?)', (office, "office")
+            )
 
         all_livingspaces = self.rooms.get('livingspace')
         for livingspace in all_livingspaces:
-            cur.execute('INSERT INTO Room(Name, Type) VALUES(?, ?)',(livingspace, "livingspace"))
+            cur.execute(
+                'INSERT INTO Room(Name, Type) VALUES(?, ?)',
+                (livingspace, "livingspace"))
 
         allocated_offices = self.rooms.get('office')
         for office, people in allocated_offices.items():
             for values in people:
                 for v in values:
-                    cur.execute('INSERT INTO Allocated(Person_Name, Room_Name) VALUES(?, ?)',(v, office))
+                    cur.execute(
+                        'INSERT INTO Allocated(Person_Name, Room_Name) \
+                        VALUES(?, ?)', (v, office))
 
         allocated_livingspaces = self.rooms.get('livingspace')
         for livingspace, people in allocated_livingspaces.items():
             for values in people:
                 for v in values:
-                    cur.execute('INSERT INTO Allocated(Person_Name, Room_Name) VALUES(?, ?)',(v, livingspace))
+                    cur.execute(
+                        'INSERT INTO Allocated(Person_Name, Room_Name) \
+                         VALUES(?, ?)', (v, livingspace))
+        return True
         conn.commit()
         conn.close()
 
-
-
     def load_state(self, db_name):
         """
-            Loads the data inputted into the Amity system from a SQLite database.
+            Loads the data inputted into the Amity system from a
+            SQLite database.
         """
 
         conn = sqlite3.connect(db_name)
         cur = conn.cursor()
 
-        #fellow
         cur.execute('SELECT Name FROM Person WHERE Role = "fellow"')
         all_fellows = cur.fetchall()
-        # print (all_fellows)
         for fellow_tuple in all_fellows:
             fellow_list = list(fellow_tuple)
             for fellow_element in fellow_list:
                 self.persons['fellow'].append(fellow_element)
-        # print (self.persons)
 
-        # staff
         cur.execute('SELECT Name FROM Person WHERE Role = "staff"')
         all_staff = cur.fetchall()
-        # print (all_staff)
         for staff_tuple in all_staff:
             staff_list = list(staff_tuple)
             for staff_element in staff_list:
                 self.persons['staff'].append(staff_element)
-        # print (self.persons)
 
-        #offices
         cur.execute('SELECT Name FROM Room WHERE Type = "office"')
         load_office = cur.fetchall()
-        # print (load_office)
         for office_tuple in load_office:
             office_list = list(office_tuple)
             for office_element in office_list:
                 self.rooms['office'][office_element] = []
-        # print (self.rooms)
 
-        #livingspaces
         cur.execute('SELECT Name FROM Room WHERE Type = "livingspace"')
         load_livingspace = cur.fetchall()
-        print (load_livingspace)
         for livingspace_tuple in load_livingspace:
             livingspace_list = list(livingspace_tuple)
             for livingspace_element in livingspace_list:
                 self.rooms['livingspace'][livingspace_element] = []
-        print (self.rooms)
 
-        # allocated rooms
         cur.execute('SELECT * FROM Allocated')
         load_allocated_all = cur.fetchall()
-        print (load_allocated_all)
         for all_tuple in load_allocated_all:
             all_list = list(all_tuple)
             offices = self.rooms.get('office')
             livingspaces = self.rooms.get('livingspace')
-            # import pdb;pdb.set_trace()
             if all_list[1] in offices.keys():
                 offices[all_list[1]].append(all_list[0])
             else:
                 livingspaces[all_list[1]].append(all_list[0])
-        print (self.rooms)
-
+        return True
 
         conn.close()
