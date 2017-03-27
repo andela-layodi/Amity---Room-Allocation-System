@@ -102,7 +102,7 @@ class AmityTest(unittest.TestCase):
         self.Amity.create_room('LAGOS', 'office')
         reallocate_person = self.Amity.reallocate_person(
             "office", 'MOMBASA', 'LAGOS', 'LAVENDER AYODI')
-        self.assertEqual(True, reallocate_person)
+        self.assertIn("Success", reallocate_person)
 
     def test_reallocate_invalid_person(self):
         self.Amity.create_room('MOMBASA', 'office')

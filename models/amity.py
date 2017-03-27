@@ -1,6 +1,7 @@
 import random
 import sqlite3
 from models.room import Office, LivingSpace
+from titlecase import titlecase
 
 
 class Amity(object):
@@ -36,7 +37,10 @@ class Amity(object):
             return {"Error": "This room already exists"}
         if self.rooms.get(room_type, None) is not None:
             self._assign_room_name(room_type, room_name)
-            return {"Success": "{} has been added successfully".format(room_name)}
+            return {
+                "Success": "{} has been added successfully"
+                .format(room_name)
+                }
 
     def _assign_room_name(self, room_type, room_name):
         """
@@ -55,18 +59,19 @@ class Amity(object):
             automatically allocates them to a random room.
         """
         # import pdb;pdb.set_trace()
-        if not person_name:
+        person = titlecase(person_name)
+        if not person:
             return {"Error": "Please insert a name."}
 
         if person_type not in self.persons.keys():
             return {"Error": "Insert fellow or staff for person type"}
-        if person_name in self.persons.get(person_type):
+        if person in self.persons.get(person_type):
             return {"Error": "Name already exists. Choose another name."}
         allocated_space = {}
-        self.persons.get(person_type).append(person_name)
+        self.persons.get(person_type).append(person)
         if person_type.lower() == 'fellow' or 'staff':
             allocated_office = self._search_room(
-                person_name,
+                person,
                 "office",
                 self.office_.MAX_OFFICE_OCCUPANTS
             )
@@ -75,7 +80,7 @@ class Amity(object):
 
         if person_type.lower() == "fellow" and wants_accomodation is not "N":
             allocated_livingspace = self._search_room(
-                person_name,
+                person,
                 "livingspace",
                 self.livingspace_.MAX_LIVING_OCCUPANTS
             )
@@ -84,7 +89,8 @@ class Amity(object):
 
         if allocated_space:
             return {
-                "Done": "{} has been added to room successfully".format(person_name)
+                "Done": "{} has been added to room successfully"
+                .format(person)
             }
 
         if not allocated_office or not allocated_livingspace:
@@ -97,7 +103,7 @@ class Amity(object):
             the available rooms.
         """
         office = self.rooms.get(room_type).keys()
-        print (office)
+        # print (office)
         search_office = list(office)
         if not search_office:
             return "the system. No rooms available at the moment."
@@ -107,7 +113,8 @@ class Amity(object):
             occupants = self.rooms.get(room_type)[random_office]
         # check # of occupants in room against MAX_OFFICE_OCCUPANTS
             if len(occupants) < max_occupants:
-                occupants.append(person_name)
+                person_title = titlecase(person_name)
+                occupants.append(person_title)
                 return random_office
             # pop a room once it has been chosen
             search_office.remove(random_office)
@@ -144,7 +151,10 @@ class Amity(object):
         if len(new_roommates) < maximum:
             new_roommates.append(person_name)
             current_roommates.remove(person_name)
-            return True
+            return {
+                "Success": "{} has been successfully reallocated to {}."
+                .format(person_name, room_name)
+                }
 
         return False
 
@@ -179,14 +189,15 @@ class Amity(object):
                 firstname = data[0]
                 secondname = data[1]
                 fullname = firstname + " " + secondname
+                name = titlecase(fullname)
                 position = data[2].lower()
-                self.persons.get(position).append(fullname)
+                # self.persons.get(position).append(fullname)
                 try:
                     accomodation = data[3]
                 except IndexError:
                     pass
-                self.add_person(fullname, position, accomodation)
-            print (self.persons)
+                self.add_person(name, position, accomodation)
+
         return {'Done': "File has been loaded successfully"}
 
     def print_allocations(self, room_type, filename):
