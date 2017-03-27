@@ -1,5 +1,6 @@
 import random
 import sqlite3
+from models.room import Office, LivingSpace
 
 
 class Amity(object):
@@ -9,8 +10,6 @@ class Amity(object):
     """
 
     def __init__(self):
-        self.MAX_OFFICE_OCCUPANTS = 6
-        self.MAX_LIVING_OCCUPANTS = 4
         self.rooms = {
             'office': {},
             'livingspace': {}
@@ -19,6 +18,9 @@ class Amity(object):
             'fellow': [],
             'staff': []
         }
+
+    office_ = Office()
+    livingspace_ = LivingSpace()
 
     def create_room(self, room_name, room_type):
         """
@@ -34,7 +36,7 @@ class Amity(object):
             return {"Error": "This room already exists"}
         if self.rooms.get(room_type, None) is not None:
             self._assign_room_name(room_type, room_name)
-            return {"Success": "Room has been added successfully"}
+            return {"Success": "{} has been added successfully".format(room_name)}
 
     def _assign_room_name(self, room_type, room_name):
         """
@@ -52,35 +54,41 @@ class Amity(object):
             Adds new people into the system by specifying their role and
             automatically allocates them to a random room.
         """
+        # import pdb;pdb.set_trace()
         if not person_name:
-            return "Please insert a name."
+            return {"Error": "Please insert a name."}
 
-        if person_name in self.persons.get(person_type):
-            return "Name already exists. Choose another name."
         if person_type not in self.persons.keys():
             return {"Error": "Insert fellow or staff for person type"}
+        if person_name in self.persons.get(person_type):
+            return {"Error": "Name already exists. Choose another name."}
         allocated_space = {}
         self.persons.get(person_type).append(person_name)
-        allocated_office = self._search_room(
-            person_name,
-            "office",
-            self.MAX_OFFICE_OCCUPANTS
-        )
-        if allocated_office:
-            allocated_space["office"] = allocated_office
+        if person_type.lower() == 'fellow' or 'staff':
+            allocated_office = self._search_room(
+                person_name,
+                "office",
+                self.office_.MAX_OFFICE_OCCUPANTS
+            )
+            if allocated_office:
+                allocated_space["office"] = allocated_office
+
         if person_type.lower() == "fellow" and wants_accomodation is not "N":
             allocated_livingspace = self._search_room(
                 person_name,
                 "livingspace",
-                self.MAX_LIVING_OCCUPANTS
+                self.livingspace_.MAX_LIVING_OCCUPANTS
             )
             if allocated_livingspace:
                 allocated_space["livingspace"] = allocated_livingspace
-        user_room = allocated_space.values()
-        for room in user_room:
+
+        if allocated_space:
             return {
-                "Done": "{} has been added to {}".format(person_name, room)
+                "Done": "{} has been added to room successfully".format(person_name)
             }
+
+        if not allocated_office or not allocated_livingspace:
+            return "Rooms not available"
 
     def _search_room(self, person_name, room_type, max_occupants):
         """
@@ -89,7 +97,10 @@ class Amity(object):
             the available rooms.
         """
         office = self.rooms.get(room_type).keys()
+        print (office)
         search_office = list(office)
+        if not search_office:
+            return "the system. No rooms available at the moment."
         searching = True
         while searching:
             random_office = random.choice(search_office)
@@ -115,7 +126,7 @@ class Amity(object):
                       True on successful reallocation
                       False on fail
         """
-        maximum = self.MAX_LIVING_OCCUPANTS
+        maximum = self.livingspace_.MAX_LIVING_OCCUPANTS
         current_roommates = self._find_room_occupant(room_type, current_room)
         if "Error" in current_roommates:
             return current_roommates
@@ -129,7 +140,7 @@ class Amity(object):
         if "Error" in new_roommates:
             return new_roommates
         if room_type == "office":
-            maximum = self.MAX_OFFICE_OCCUPANTS
+            maximum = self.office_.MAX_OFFICE_OCCUPANTS
         if len(new_roommates) < maximum:
             new_roommates.append(person_name)
             current_roommates.remove(person_name)
@@ -169,11 +180,13 @@ class Amity(object):
                 secondname = data[1]
                 fullname = firstname + " " + secondname
                 position = data[2].lower()
+                self.persons.get(position).append(fullname)
                 try:
                     accomodation = data[3]
                 except IndexError:
                     pass
                 self.add_person(fullname, position, accomodation)
+            print (self.persons)
         return {'Done': "File has been loaded successfully"}
 
     def print_allocations(self, room_type, filename):
@@ -286,9 +299,9 @@ class Amity(object):
                     cur.execute(
                         'INSERT INTO Allocated(Person_Name, Room_Name) \
                          VALUES(?, ?)', (v, livingspace))
-        return True
         conn.commit()
         conn.close()
+        return True
 
     def load_state(self, db_name):
         """
@@ -337,6 +350,6 @@ class Amity(object):
                 offices[all_list[1]].append(all_list[0])
             else:
                 livingspaces[all_list[1]].append(all_list[0])
-        return True
 
         conn.close()
+        return True

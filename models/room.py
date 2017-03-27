@@ -1,17 +1,15 @@
 class Room(object):
-
-    def __init__(self, room_name, room_type):
-        self.room_name = room_name
-        self.room_type = room_type
+    def __init__(self):
+        pass
 
 
 class Office(Room):
-    max_capacity = 6
-    def __init__(self, room_name, person_name, occupant_no):
-        super(Office, self).__init__(room_name, room_type)
+    def __init__(self):
+        super(Office, self).__init__()
+        self.MAX_OFFICE_OCCUPANTS = 6
 
 
 class LivingSpace(Room):
-    max_capacity = 4
-    def __init__(self, room_name, person_name, occupant_no):
-        super(LivingSpace, self).__init__(room_name, room_type)
+    def __init__(self):
+        super(LivingSpace, self).__init__()
+        self.MAX_LIVING_OCCUPANTS = 4

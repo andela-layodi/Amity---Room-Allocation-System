@@ -16,7 +16,7 @@ class AmityTest(unittest.TestCase):
             for names in room_types.get(room):
                 self.Amity._assign_room_name(room, names)
 
-    def test_create_room_without_room(self):
+    def test_create_room_without_name(self):
         room_created = self.Amity.create_room("", 'LivingSpace')
         self.assertIn("Error", room_created)
 
@@ -55,14 +55,13 @@ class AmityTest(unittest.TestCase):
 
     def test_add_person_without_name(self):
         person_added = self.Amity.add_person('', 'fellow', 'N')
-        self.assertEqual(person_added, "Please insert a name.")
+        self.assertIn('Error', person_added)
 
     def test_add_person_exists(self):
         self._create_rooms()
         self.Amity.add_person('LESLEY AYODI', 'staff', 'Y')
         person_added = self.Amity.add_person('LESLEY AYODI', 'staff', 'Y')
-        self.assertEqual(
-            person_added, "Name already exists. Choose another name.")
+        self.assertIn('Error', person_added)
 
     def test_add_person_to_room(self):
         # self._create_rooms()
@@ -81,6 +80,7 @@ class AmityTest(unittest.TestCase):
         self.Amity.add_person('LAVENDER AYODI', 'fellow', 'N')
         self.Amity.add_person('PATIENCE AYODI', 'staff', 'N')
         room_occupants = self.Amity._find_room_occupant('office', 'MOMBASA')
+        print (room_occupants)
         self.assertEqual(len(room_occupants), 3)
 
     def test_invalid_room_type(self):
@@ -162,6 +162,9 @@ class AmityTest(unittest.TestCase):
     def test_load_state_works(self):
         loaded_state = self.Amity.load_state('test_amity.db')
         self.assertEqual(True, loaded_state)
+
+    # def tearDown(self):
+    #     self.Amity.dispose()
 
 
 if __name__ == '__main__':
