@@ -8,7 +8,7 @@ Usage:
     reallocate_person <room_type> <current_room> <new_room> <first_name> <second_name>
     load_people <filename>
     print_allocations <room_type> <filename>
-    print_unallocated <room_type> <room_name>[--o=filename]
+    print_unallocated <filename>
     print_room <room_type> <room_name>
     save_state <db_name>
     load_state <db_name>
@@ -136,9 +136,11 @@ class AmityApp(cmd.Cmd):
         """
         Prints and outputs the people who have been not yet been allocated
         a room.
-        Usage: print_unallocated <room_type> <room_name>[--o=filename]
+        Usage: print_unallocated <filename>
         """
-        pass
+        filename = arg['<filename>']
+
+        print (self.amity.print_unallocated(filename))
 
     @docopt_cmd
     def do_print_room(self, arg):

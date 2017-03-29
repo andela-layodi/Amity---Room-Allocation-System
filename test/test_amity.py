@@ -64,15 +64,14 @@ class AmityTest(unittest.TestCase):
         self.assertIn('Error', person_added)
 
     def test_add_person_to_room(self):
-        # self._create_rooms()
+        self.Amity.create_room('MOMBASA', 'office')
         room_allocated = self.Amity.add_person('EMILY MBELENGA', 'fellow', 'N')
-        print (room_allocated)
         self.assertIn("Done", room_allocated)
 
-    # def test_add_invalid_person_type(self):
-    #     self._create_rooms()
-    #     type_added = self.Amity.add_person('LESLEY AYODI', 'cook', 'N')
-    #     self.assertIn('Error', type_added)
+    def test_add_invalid_person_type(self):
+        self.Amity.create_room('MOMBASA', 'office')
+        type_added = self.Amity.add_person('LESLEY AYODI', 'cook', 'N')
+        self.assertIn('Error', type_added)
 
     def test_check_occupants(self):
         self.Amity.create_room('MOMBASA', 'office')
@@ -96,12 +95,12 @@ class AmityTest(unittest.TestCase):
         self.assertIn("Error", room_occupants)
 
     def test_reallocate_person(self):
-        self.Amity.create_room('MOMBASA', 'office')
-        self.Amity.add_person('LESLEY AYODI', 'staff', 'N')
-        self.Amity.add_person('LAVENDER AYODI', 'staff', 'N')
-        self.Amity.create_room('LAGOS', 'office')
+        self.Amity.create_room('Mombasa', 'office')
+        self.Amity.add_person('Lesley Ayodi', 'staff', 'N')
+        self.Amity.add_person('Lavender Ayodi', 'staff', 'N')
+        self.Amity.create_room('Lagos', 'office')
         reallocate_person = self.Amity.reallocate_person(
-            "office", 'MOMBASA', 'LAGOS', 'LAVENDER AYODI')
+            "office", 'Mombasa', 'Lagos', 'Lavender Ayodi')
         self.assertIn("Success", reallocate_person)
 
     def test_reallocate_invalid_person(self):
@@ -117,27 +116,38 @@ class AmityTest(unittest.TestCase):
         self.assertIn('Error', invalid_room)
 
     def test_full_room(self):
-        self.Amity.create_room('LAGOS', 'office')
-        self.Amity.add_person('LESLEY AYODI', 'staff', 'N')
-        self.Amity.create_room('MOMBASA', 'office')
+        self.Amity.create_room('Lagos', 'office')
+        self.Amity.add_person('Lesley Ayodi', 'staff', 'N')
+        self.Amity.create_room('Mombasa', 'office')
         occupants = ['A', 'B', 'C', 'D', 'E', 'F']
         office = self.Amity.rooms.get('office')
-        office['MOMBASA'] = occupants
+        office['Mombasa'] = occupants
         reallocate_person = self.Amity.reallocate_person(
-            "office", 'LAGOS', 'MOMBASA', 'LESLEY AYODI')
+            "office", 'Lagos', 'Mombasa', 'Lesley Ayodi')
         self.assertEqual(False, reallocate_person)
 
     def test_print_allocations(self):
-        self.Amity.create_room('LAGOS', 'office')
-        self.Amity.add_person('LESLEY AYODI', 'staff', 'N')
-        allocated_room = self.Amity.print_allocations('office', 'rooms.txt')
-        self.assertEqual(allocated_room, {'LAGOS': ['LESLEY AYODI']})
+        self.Amity.create_room('Lagos', 'office')
+        self.Amity.add_person('Lesley Ayodi', 'staff', 'N')
+        allocated_room = self.Amity.print_allocations('office', 'room.txt')
+        self.assertEqual(allocated_room, {'Lagos': ['Lesley Ayodi']})
 
     def test_print_allocations_terminal(self):
-        self.Amity.create_room('LAGOS', 'office')
-        self.Amity.add_person('LESLEY AYODI', 'staff', 'N')
-        allocated_room = self.Amity.print_allocations('office', 'rooms.txt')
-        self.assertEqual(allocated_room, {'LAGOS': ['LESLEY AYODI']})
+        self.Amity.create_room('Lagos', 'office')
+        self.Amity.add_person('Lesley Ayodi', 'staff', 'N')
+        allocated_room = self.Amity.print_allocations('office', 'room.txt')
+        self.assertEqual(allocated_room, {'Lagos': ['Lesley Ayodi']})
+
+    def test_print_unallocated_persons(self):
+        self.Amity.create_room('RUBY', 'livingspace')
+        self.Amity.add_person('LESLEY AYODI', 'fellow', 'Y')
+        self.Amity.add_person('LAVENDER AYODI', 'fellow', 'Y')
+        self.Amity.add_person('BRIAN MUTHUI', 'fellow', 'Y')
+        self.Amity.add_person('DENNIS MWANGI', 'fellow', 'Y')
+        self.Amity.add_person('MBARAK MBIGO', 'fellow', 'Y')
+        self.Amity.add_person('DENNIS YESWA', 'fellow', 'Y')
+        unallocated = self.Amity.print_unallocated('unallocated.txt')
+        self.assertEqual(len(unallocated), 2)
 
     def test_print_room_occupants(self):
         self.Amity.create_room('MOMBASA', 'office')

@@ -87,14 +87,16 @@ class Amity(object):
             if allocated_livingspace:
                 allocated_space["livingspace"] = allocated_livingspace
 
-        if allocated_space:
-            return {
-                "Done": "{} has been added to room successfully"
-                .format(person)
-            }
-
-        if not allocated_office or not allocated_livingspace:
-            return "Rooms not available"
+        for keys, values in self.rooms.items():
+            for k, v in values.items():
+                if person in v:
+                    return {
+                        "Done": "{} has been successfully added to room"
+                        .format(person)}
+                else:
+                    return {
+                        "Fail": "{} has been added but is not allocated yet"
+                        .format(person)}
 
     def _search_room(self, person_name, room_type, max_occupants):
         """
@@ -206,9 +208,8 @@ class Amity(object):
             the Amity system.
         """
         allocated_rooms = self.rooms.get(room_type)
-        # return get_those_rooms
 
-        with open('rooms.txt', 'w') as myfile:
+        with open(filename, 'w') as myfile:
             for key in sorted(allocated_rooms):
                 myfile.write(
                     key +
@@ -221,17 +222,22 @@ class Amity(object):
                     '\n')
         return allocated_rooms
 
-    def print_unallocated(self, room_type, room_name, filename):
+    def print_unallocated(self, filename):
         """
             Prints out and outputs to a text file a list of people who are yet
             to be allocated a room.
         """
-        unallocated = []
-        allocated_rooms = self.rooms.get(room_type)
-        for value in self.persons[room_type]:
-            if value not in allocated_rooms:
-                unallocated.append(value)
-        return unallocated
+        for keys, values in self.rooms.items():
+            for k, v in values.items():
+                for key, value in self.persons.items():
+                    c = set(v).union(set(value))
+                    d = set(v).intersection(set(value))
+                    listy = list(c-d)
+
+                    with open(filename, 'w') as file_handler:
+                        for item in listy:
+                            file_handler.write("{}\n".format(item))
+                    return listy
 
     def print_room(self, room_type, room_name):
         """
