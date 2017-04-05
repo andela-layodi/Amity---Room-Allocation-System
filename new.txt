@@ -1,0 +1,8 @@
+kigali 
+  ['Dominic Walters', 'Simon Patterson', 'Mari Lawrence', 'Leigh Riley', 'Tana Lopez']
+hogwarts 
+  ['Oluwafemi Sule', 'KELLY McGuire']
+php 
+  ['Simon Patterson', 'Mari Lawrence', 'Tana Lopez']
+topaz 
+  ['Oluwafemi Sule']

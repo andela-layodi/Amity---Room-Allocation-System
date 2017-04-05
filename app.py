@@ -4,12 +4,12 @@ Room Allocation System
 This system facilitates easier room allocation for people at Amity.
 Usage:
     create_room <room_name> <room_type>
-    add_person <first_name> <second_name> <person_type> [--wants_accomodation=N]
-    reallocate_person <room_type> <current_room> <new_room> <first_name> <second_name>
+    add_person <first_name> <second_name> <person_type> [--Y]
+    reallocate_person <first_name> <second_name> <new_room>
     load_people <filename>
-    print_allocations <room_type> <filename>
+    print_allocations <filename>
     print_unallocated <filename>
-    print_room <room_type> <room_name>
+    print_room <room_name>
     save_state <db_name>
     load_state <db_name>
     quit
@@ -36,6 +36,7 @@ def docopt_cmd(func):
     This decorator is used to simplify the try/except block and pass the result
     of the docopt parsing to the called action.
     """
+
     def fn(self, arg):
         try:
             opt = docopt(fn.__doc__, arg)
@@ -66,7 +67,7 @@ class AmityApp(cmd.Cmd):
     intro = cprint(
         figlet_format("Amity Room App", font="cosmic"), "white")
     prompt = 'Amity>>> '
-    file = None
+    # file = None
 
     amity = Amity()
 
@@ -86,7 +87,6 @@ class AmityApp(cmd.Cmd):
         Creates a new person and assigns them to a random room in Amity.
         Usage: add_person <first_name> <second_name> <person_type> [--Y]
         """
-        print (arg)
         person_name = arg["<first_name>"] + " " + arg["<second_name>"]
         person_type = arg["<person_type>"]
         wants_accomodation = arg["--Y"]
@@ -96,21 +96,19 @@ class AmityApp(cmd.Cmd):
 
         print (
             self.amity.add_person(person_name, person_type, wants_accomodation)
-            )
+        )
 
     @docopt_cmd
     def do_reallocate_person(self, arg):
         """
         Reallocates a person to a new room of their choice.
-        Usage: reallocate_person <room_type> <current_room> <new_room> <first_name> <second_name>
+        Usage: reallocate_person <first_name> <second_name> <new_room>
         """
-        room_type = arg["<room_type>"]
-        current_room = arg["<current_room>"]
-        room_name = arg["<new_room>"]
+        new_room_name = arg["<new_room>"]
         person_name = arg["<first_name>"] + " " + arg["<second_name>"]
         print (
             self.amity.reallocate_person
-            (room_type, current_room, room_name, person_name))
+            (person_name, new_room_name))
 
     @docopt_cmd
     def do_load_people(self, arg):
@@ -125,11 +123,10 @@ class AmityApp(cmd.Cmd):
         """
         Prints and outputs the people who have been successfully allocated
         a space per room.
-        Usage: print_allocations <room_type> <filename>
+        Usage: print_allocations <filename>
         """
-        room_type = arg["<room_type>"]
         filename = arg['<filename>']
-        print (self.amity.print_allocations(room_type, filename))
+        print (self.amity.print_allocations(filename))
 
     @docopt_cmd
     def do_print_unallocated(self, arg):
@@ -146,11 +143,10 @@ class AmityApp(cmd.Cmd):
     def do_print_room(self, arg):
         """
         Prints the people who have been allocated the specified room.
-        Usage: print_room <room_type> <room_name>
+        Usage: print_room <room_name>
         """
-        room_type = arg["<room_type>"]
         room_name = arg['<room_name>']
-        print (self.amity.print_room(room_type, room_name))
+        print (self.amity.print_room(room_name))
 
     @docopt_cmd
     def do_save_state(self, arg):
@@ -158,12 +154,9 @@ class AmityApp(cmd.Cmd):
         Saves the data to a SQLite database
         Usage: save_state <db_name>
         """
-        # db = arg[<"db_name">]
-        # if db:
-        # 	self.amity.save_state(db)
-        # else:
-        # 	self.amity.save_state()
-        pass
+        db_name = arg["<db_name>"]
+
+        print (self.amity.save_state(db_name))
 
     @docopt_cmd
     def do_load_state(self, arg):
