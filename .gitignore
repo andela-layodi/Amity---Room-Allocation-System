@@ -7,3 +7,5 @@ static/.DS_Store
 .coverage
 static-collected
 myvenv/*
+sqlite3/*
+cover/*
