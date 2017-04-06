@@ -167,16 +167,26 @@ class Amity(object):
                       True on successful reallocation
                       False on fail
         """
+        persons = self.persons.get('fellow', []) + self.persons.get('staff', [])
         try:
-            for person in self.persons['fellow'] + self.persons['staff']:
+            for person in persons:
                 if person_name == person.person_name and person.person_type == 'staff':
                     self._reallocate_staff(person_name, new_room_name)
+                    return {
+                        'Success': '{} reallocated to {}'.format(
+                            person_name, new_room_name)}
                     break
                 elif person_name == person.person_name and person.person_type == 'fellow':
-                    self._reallocate_fellow(person_name, new_room_name)
-                    break
+                    result = self._reallocate_fellow(person_name, new_room_name)
+                    if result:
+                        return {
+                            'Success': '{} moved to {}'.format(
+                                person_name, new_room_name)}
+                    return 'Error {}'.format(result)
+                else:
+                    return {'Error': 'Person does not exist.'}
         except:
-            return {'Person does not exist'}
+            return {'Error': 'Person does not exist'}
 
     def _find_room_occupant(self, room_type, room_name):
         """
@@ -207,41 +217,42 @@ class Amity(object):
                     self.rooms['livingspace'][room].remove(person_name)
 
     def _reallocate_fellow(self, person_name, new_room_name):
-        try:
-            for room in self.rooms['office']:
-                if room.room_name == new_room_name:
-                    for person in self.rooms[room.room_type][room]:
-                        if person_name == person:
-                            return{
-                                '{} is already in this room'.format(
-                                    person_name)}
-                            break
+        for room in self.rooms['office']:
+            if room[room_name] == new_room_name:
+                for person in self.rooms[room.room_type][room]:
+                    if person_name == person:
+                        return{
+                            '{} is already in this room'.format(
+                                person_name)}
+
                     if len(self.rooms[room.room_type]
-                            [room]) > room.max_occupants:
+                            [room]) >= room.max_occupants:
                         return{'Room is already full.'}
-                        break
+
                     else:
                         self._delete_from_previous_allocated_office(
                             person_name)
                         self.rooms[room.room_type][room].append(person_name)
-            for room in self.rooms['livingspace']:
-                if room.room_name == new_room_name:
-                    for person in self.rooms[room.room_type][room]:
-                        if person_name == person:
-                            return{
-                                '{} is already in this room'.format(
-                                    person_name)}
-                            break
+                        return 'room'
+
+        for room in self.rooms['livingspace']:
+            if room[room_name] == new_room_name:
+                for person in self.rooms[room.room_type][room]:
+                    if person_name == person:
+                        return{
+                            '{} is already in this room'.format(
+                                person_name)}
+
                     if len(self.rooms[room.room_type]
-                           [room]) > room.max_occupants:
+                           [room]) >= room.max_occupants:
                         return {'Room is already full.'}
-                        break
+
                     else:
                         self._delete_from_previous_allocated_livingspace(
                             person_name)
                         self.rooms[room.room_type][room].append(person_name)
-        except Exception as e:
-            return e
+                        return 'living'
+        return None
 
     def _reallocate_staff(self, person_name, new_room_name):
         for room in self.rooms['office']:
@@ -250,7 +261,7 @@ class Amity(object):
                     if person_name == person:
                         return {
                             '{} is already in this room'.format(person_name)}
-                if len(self.rooms[room.room_type][room]) > room.max_occupants:
+                if len(self.rooms[room.room_type][room]) >= room.max_occupants:
                     return {'Room is already full.'}
                 else:
                     self._delete_from_previous_allocated_office(person_name)
@@ -335,13 +346,13 @@ class Amity(object):
             if room.room_name == room_name:
                 print(room_name)
                 print(occupants)
-                break
+        return
 
         for room, occupants in self.rooms['livingspace'].items():
             if room.room_name == room_name:
                 print(room_name)
                 print(occupants)
-                break
+        return
 
     def save_state(self, db_name):
         """

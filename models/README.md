@@ -11,7 +11,6 @@
 * Easy to user interface to interact with.
 
 ### Dependencies | Requirements
-### Dependencies | Requirements
 * appdirs (1.4.3)
 * appnope (0.1.0)
 * autopep8 (1.3.1)
@@ -50,7 +49,7 @@
 * traitlets (4.3.2)
 * wcwidth (0.1.7)
 
-#### To install all requirements, download the [requirements.txt] (https://github.com/andela-layodi/bc-14--ToDo-Console-Application-/blob/master/Desktop/todo_console/requirements.txt) file then type this in your terminal application:
+#### To install all requirements, download the [requirements.txt] (https://github.com/andela-layodi/Amity-Room-Allocation-System/blob/master/requirements.txt) file then type this in your terminal application:
              pip install -r /path/to/requirements.txt
 
 

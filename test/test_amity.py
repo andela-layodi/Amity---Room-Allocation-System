@@ -10,7 +10,7 @@ class AmityTest(unittest.TestCase):
         self.amity.room_types = {
             "office": {Office('MOMBASA'): ['Lavender Ayodi'],
                        Office('HOGWARTS'): [],
-                       Office('LAGOS'): []},
+                       Office('LAGOS'): ['A', 'B', 'C', 'D', 'E', 'F']},
             "livingspace": {LivingSpace('KENYA'): [],
                             LivingSpace('PLATFORM'): [],
                             LivingSpace('VALHALLA'): []}
@@ -99,29 +99,23 @@ class AmityTest(unittest.TestCase):
 
     def test_reallocate_person(self):
         reallocate_person = self.amity.reallocate_person(
-            "office", 'MOMBASA', 'HOGWARTS', 'Lavender Ayodi')
+            'Lavender Ayodi', 'HOGWARTS')
         self.assertIn("Success", reallocate_person)
 
     def test_reallocate_invalid_person(self):
         reallocate_person = self.amity.reallocate_person(
-            "office", 'MOMBASA', 'LAGOS', 'ISABEL AYODI')
+            'ISABEL AYODI', 'HOGWARTS')
         self.assertIn('Error', reallocate_person)
 
     def test_reallocate_invalid_room(self):
         invalid_room = self.amity.reallocate_person(
-            "office", 'MOMBASA', 'LAGOS', 'ISABEL AYODI')
+            'Lavender Ayodi', 'HOGWART')
         self.assertIn('Error', invalid_room)
 
     def test_full_room(self):
-        self.amity.create_room('Lagos', 'office')
-        self.amity.add_person('Lesley Ayodi', 'staff', 'N')
-        self.amity.create_room('Mombasa', 'office')
-        occupants = ['A', 'B', 'C', 'D', 'E', 'F']
-        office = self.amity.rooms.get('office')
-        office['Mombasa'] = occupants
         reallocate_person = self.amity.reallocate_person(
-            "office", 'Lagos', 'Mombasa', 'Lesley Ayodi')
-        self.assertEqual(False, reallocate_person)
+            'Lavender Ayodi', 'LAGOS')
+        self.assertEqual('Room is already full.', reallocate_person)
 
     def test_print_allocations(self):
         self.amity.add_person('Lesley Ayodi', 'staff', 'N')
@@ -145,12 +139,8 @@ class AmityTest(unittest.TestCase):
         self.assertEqual(len(unallocated), 1)
 
     def test_print_room_occupants(self):
-        self.amity.create_room('MOMBASA', 'office')
-        self.amity.add_person('LESLEY AYODI', 'staff', 'N')
-        self.amity.add_person('LAVENDER AYODI', 'fellow', 'N')
-        self.amity.add_person('PATIENCE AYODI', 'staff', 'N')
-        available_occupants = self.amity.print_room('office', 'MOMBASA')
-        self.assertIn('Success', available_occupants)
+        available_occupants = self.amity.print_room('MOMBASA')
+        self.assertIn('Lavender Ayodi', available_occupants)
 
     def test_load_people_from_file(self):
         persons_list = self.amity.persons.get('fellow')
